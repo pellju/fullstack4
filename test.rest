@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json; charset=utf-8
+
+{
+    "title": "Onks pakkojossei haluu? Part2",
+    "author": "Mie",
+    "url": "uotm8",
+    "likes": 1337
+}

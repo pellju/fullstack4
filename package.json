@@ -1,0 +1,35 @@
+{
+  "name": "fullstack4",
+  "version": "1.0.0",
+  "description": "Exercises for fullstackopen round 4",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --verbose",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pellju/fullstack4.git"
+  },
+  "author": "pellju",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pellju/fullstack4/issues"
+  },
+  "homepage": "https://github.com/pellju/fullstack4#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "http": "^0.0.1-security",
+    "lodash": "^4.17.21",
+    "mongoose": "^6.1.4",
+    "nodemon": "^2.0.15"
+  },
+  "devDependencies": {
+    "jest": "^27.4.5"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
