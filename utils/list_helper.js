@@ -49,6 +49,5 @@ module.exports = {
     dummy,
     totalLikes,
     favoriteBlog,
-    mostBlogs,
-    mostLikes
+    mostBlogs
 }
