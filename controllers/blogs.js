@@ -4,6 +4,7 @@ const blog = require('../models/blog')
 const Blog = require('../models/blog')
 const router = require('express').Router()
 const logger = require('../utils/logger')
+const User = require('../models/user')
 
 router.get('/', (req, res) => {
   res.send('Well, the bottomline is this: Everything is conscious.')
@@ -12,30 +13,38 @@ router.get('/', (req, res) => {
 router.get('/blogs', (request, response) => {
     Blog
       .find({})
+      .populate('users')
       .then(blogs => {
         //logger.info(blogs)
         response.json(blogs)
       })
   })
   
-router.post('/blogs', (request, response) => {
+router.post('/blogs', async(request, response) => {
     const body = request.body
     //logger.info(body)
 
-    if (body.title === undefined || body.url === undefined) {
-      return response.status(400).send({ error: "Title or url missing" })
+    if (body.title === undefined || body.url === undefined || body.userId === undefined) {
+      return response.status(400).send({ error: "Title, url or userid missing" })
     }
 
-    const blog = new Blog(body)
+    const user = await User.findById(body.userId)
+    //logger.info(user)
+    const blog = new Blog({
+      title: body.title,
+      author: body.author,
+      url: body.url,
+      users: user._id
+    })
+    
     if (blog.likes === undefined) {
       blog.likes = 0
     }
-
-    blog
-      .save()
-      .then(result => {
-        response.status(201).json(result)
-      })
+    const savedBlog = await blog.save()
+    //logger.info(user)
+    user.blogs = user.blogs.concat(savedBlog._id)
+    await user.save()
+    response.status(201).json(savedBlog.toJSON())
 })
 
 router.delete('/blogs/:id', async(request, response) => {

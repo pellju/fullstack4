@@ -113,6 +113,28 @@ test ('If deleting blog works correctly (ex. 4.13.)', async() => {
     expect(isRemovedBlogIncluded).toEqual(false)
 })
 
+test ('If password/username is shorter than 3 characters or they are not defined (ex. 4.16)', async () => {
+    const missingUsernameAndPassword = {
+        name: "Tauno Testaaja"
+    }
+
+    const userWithTooShartUsernameAndPassword = {
+        username: "tt",
+        name: "Tero Testaaja",
+        password: "k"
+    }
+
+    const properUser = {
+        username: "tanja",
+        name: "Tanja Testaaja",
+        password: "123456"
+    }
+
+    await api.post('/api/users').send(missingUsernameAndPassword).expect(400).expect('Content-Type', /application\/json/)
+    await api.post('/api/users').send(userWithTooShartUsernameAndPassword).expect(400).expect('Content-Type', /application\/json/)
+    await api.post('/api/users').send(properUser).expect(200).expect('Content-Type', /application\/json/)
+})
+
 afterAll(async () => {
     mongoose.connection.close()
 })
