@@ -5,6 +5,7 @@ const Blog = require('../models/blog')
 const router = require('express').Router()
 const logger = require('../utils/logger')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 router.get('/', (req, res) => {
   res.send('Well, the bottomline is this: Everything is conscious.')
@@ -22,13 +23,22 @@ router.get('/blogs', (request, response) => {
   
 router.post('/blogs', async(request, response) => {
     const body = request.body
-    //logger.info(body)
-
-    if (body.title === undefined || body.url === undefined || body.userId === undefined) {
-      return response.status(400).send({ error: "Title, url or userid missing" })
+    const token = request.token
+    //logger.info("Token:", token)
+    
+    if (!token || token === null){
+      logger.info("Nullified user: ", request.user)
+      return response.status(401).json({ error: 'Missing or invalid token' })
     }
 
-    const user = await User.findById(body.userId)
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    if (body.title === undefined || body.url === undefined) {
+      return response.status(400).send({ error: "Title, url or userid missing" })
+    } else if (!decodedToken) {
+      return response.status(401).send({ error: "Missing or invalid token (2)" })
+    }
+
+    const user = await User.findById(decodedToken.id)
     //logger.info(user)
     const blog = new Blog({
       title: body.title,
@@ -49,17 +59,32 @@ router.post('/blogs', async(request, response) => {
 
 router.delete('/blogs/:id', async(request, response) => {
   const id = request.params.id
+  const token = request.token
+
+  if (!token || token === null) {
+    return response.status(401).send({error: 'Missing or invalid token' })
+  }
+  const decodedToken = jwt.verify(token, process.env.SECRET)
 
   const blogs = await Blog.find({})
   const wantedBlog = blogs.find(blog => blog.id === id)
-
-  //logger.info("wantedBlog: ", wantedBlog)
-
   if (wantedBlog === undefined) {
     return response.status(400).send({error: "ID not found"})
-  } else {
+  }
+
+  const postedUserId = wantedBlog.users[0]
+  //logger.info("decodedToken.id: ", decodedToken.id, " postedUsed._id.toString(): ", postedUserId.toString())
+  
+  if (decodedToken.id === postedUserId.toString()){
+    
     await blogs[blogs.indexOf(wantedBlog)].remove()
-    response.status(200).json(await Blog.find({}))
+    const user = await User.findById(postedUserId)
+    user.blogs.splice(user.blogs.indexOf(wantedBlog.id.toString()), 1)
+    logger.info("Blog removed.")
+    return response.status(200).json(await Blog.find({}))
+  
+  } else {
+    return response.status(401).send({ error: 'Unauthorized action' })
   }
 })
 
