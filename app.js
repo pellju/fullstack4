@@ -19,7 +19,6 @@ app.use(express.static('build'))
 app.use(express.json())
 app.use(middleware.requestLogger)
 app.use(middleware.tokenExtractor)
-//app.use(middleware.userExtractor)
 
 app.use('/api', router)
 app.use('/api/users', userRegistration)

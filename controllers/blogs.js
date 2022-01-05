@@ -25,7 +25,6 @@ router.post('/blogs', async(request, response) => {
     const body = request.body
     const token = request.token
     //logger.info("Token:", token)
-    
     if (!token || token === null){
       logger.info("Nullified user: ", request.user)
       return response.status(401).json({ error: 'Missing or invalid token' })

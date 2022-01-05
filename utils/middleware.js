@@ -41,22 +41,9 @@ const tokenExtractor = (req, res, next) => {
     next()
 }
 
-const userExtractor = async(req, res, next) => {
-    const token = req.token
-    if (token === null) {
-        req.user = null
-    } else {
-        logger.info("Token not null")
-        const decodedToken = jwt.verify(token, process.env.SECRET)
-        const user = await User.findById(decodedToken)
-        req.user = user
-    }
-    next()
-}
 module.exports = {
     requestLogger,
     unknownEndpoint,
     errorHandler,
-    tokenExtractor,
-    userExtractor
+    tokenExtractor
 }
