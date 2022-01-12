@@ -16,7 +16,8 @@ router.get('/blogs', (request, response) => {
       .find({})
       .populate('users')
       .then(blogs => {
-        //logger.info(blogs)
+        logger.info("Blogs: ")
+        logger.info(blogs)
         response.json(blogs)
       })
   })
@@ -90,7 +91,7 @@ router.delete('/blogs/:id', async(request, response) => {
 router.put('/blogs/:id', async(request, response) => {
   const id = request.params.id
   const body = request.body
-  console.log(body)
+  //console.log(body)
 
   const blogs = await Blog.find({})
   const wantedBlog = blogs.find(blog => blog.id === id)
@@ -98,11 +99,13 @@ router.put('/blogs/:id', async(request, response) => {
   if (wantedBlog == undefined) {
     return response.status(400).send({ error: "ID not found"})
   } else {
+    const user = await User.findById(wantedBlog.users[0])
     const updatedBlog = {
       title: body.title,
       author: body.author,
       url: body.url,
-      likes: body.likes
+      likes: body.likes,
+      users: user._id
     }
 
     if (updatedBlog.title === undefined){
@@ -120,8 +123,9 @@ router.put('/blogs/:id', async(request, response) => {
     if (updatedBlog.likes === undefined){
       updatedBlog.likes == wantedBlog.likes
     }
-    //logger.info("updatedBlog= ", updatedBlog)
-    await Blog.updateOne({id: id}, updatedBlog)
+    logger.info("updated blog:")
+    logger.info(updatedBlog)
+    const res = await Blog.findByIdAndUpdate(id, updatedBlog, { new: true })
     return response.status(200).send(await Blog.find({}))
   }
 
