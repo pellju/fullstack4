@@ -8,6 +8,7 @@ const logger = require('./utils/logger')
 const mongoose = require('mongoose')
 const userRegistration = require('./controllers/users')
 const userLogin = require('./controllers/login')
+const testingPreparations = require('./controllers/testing')
 //logger.info('Connecting to:', config.mongoUrl)
 
 mongoose.connect(config.mongoUrl)
@@ -23,6 +24,10 @@ app.use(middleware.tokenExtractor)
 app.use('/api', router)
 app.use('/api/users', userRegistration)
 app.use('/api/login', userLogin)
+
+if (process.env.NODE_ENV === 'test') {
+    app.use('/api/testing', testingPreparations)
+}
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
